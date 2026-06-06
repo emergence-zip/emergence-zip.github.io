@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMERGENCE — soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0e17;          /* near-black */
+    --ink2:#15182a;
+    --bone:#e9e2cf;         /* paper highlight */
+    --orange:#ff5a2c;       /* riso fluoro */
+    --pink:#ff2e74;
+    --teal:#1fae9a;
+    --steel:#5a6f86;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:"Space Mono",monospace;
+    color:var(--bone);
+    background:var(--ink);
+    overflow:hidden;position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* posterized duotone glow — gives the banded, dithered gradient base */
+  .bg{
+    position:fixed;inset:-10%;z-index:0;
+    background:
+      radial-gradient(60% 55% at 78% 22%,
+        #3a1c10 0%, #3a1c10 14%,
+        #25131f 14%, #25131f 30%,
+        #181426 30%, #181426 50%,
+        var(--ink2) 50%, var(--ink2) 72%,
+        var(--ink) 72%);
+    filter:saturate(1.1);
+  }
+
+  /* ordered-dither dot grid, tiled over everything */
+  .dither{
+    position:fixed;inset:0;z-index:2;pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4'><circle cx='1' cy='1' r='0.8' fill='white'/></svg>");
+    background-size:3px 3px;
+    mix-blend-mode:overlay;opacity:.5;
+  }
+  .dither.coarse{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><circle cx='3' cy='3' r='1' fill='black'/></svg>");
+    background-size:6px 6px;mix-blend-mode:multiply;opacity:.35;
+  }
+
+  /* heavy film grain / noise */
+  .grain{
+    position:fixed;inset:-50%;z-index:7;pointer-events:none;opacity:.22;mix-blend-mode:screen;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    animation:judder .4s steps(3) infinite;
+  }
+  /* vignette */
+  .vig{position:fixed;inset:0;z-index:6;pointer-events:none;
+    background:radial-gradient(120% 110% at 50% 45%, transparent 55%, rgba(0,0,0,.7) 100%)}
+
+  /* planets layer */
+  .space{position:fixed;inset:0;z-index:1}
+  .pl{position:absolute;animation:drift 22s ease-in-out infinite}
+  .pl.big{bottom:-26vh;left:-12vw;width:min(80vh,640px);animation-duration:40s}
+  .pl.mid{top:8vh;right:6vw;width:min(26vh,200px);animation-delay:-6s}
+  .pl.small{top:54vh;right:24vw;width:min(11vh,90px);animation-delay:-12s;animation-duration:30s}
+
+  main{position:relative;z-index:5;text-align:center;padding:0 1.4rem;max-width:760px}
+  .tag{
+    font-size:.72rem;letter-spacing:.5em;text-transform:uppercase;color:var(--orange);
+    font-weight:700;display:inline-block;margin-bottom:1rem;
+    border:1px solid var(--orange);padding:.45rem .8rem .4rem;
+    opacity:0;animation:cut .1s steps(1) .5s forwards;
+  }
+  h1{
+    font-family:"Anton",sans-serif;font-weight:400;
+    font-size:clamp(3.6rem,17vw,10rem);line-height:.86;letter-spacing:.01em;
+    text-transform:uppercase;color:var(--bone);
+    text-shadow:
+      .06em .04em 0 var(--orange),
+      -.05em -.03em 0 var(--teal);
+    animation:glitch 5.5s steps(2) infinite;
+    margin:.2rem 0 1.3rem;
+  }
+  .line{
+    font-size:clamp(.85rem,2.3vw,1.05rem);line-height:1.7;color:var(--steel);
+    max-width:46ch;margin:0 auto;letter-spacing:.02em;
+    opacity:0;animation:cut .1s steps(1) 1.1s forwards;
+  }
+  .line b{color:var(--bone);font-weight:700}
+  .soon{
+    margin-top:2.4rem;display:inline-flex;align-items:center;gap:.7rem;
+    font-family:"Anton",sans-serif;font-size:1.4rem;letter-spacing:.35em;
+    text-transform:uppercase;color:var(--pink);
+    opacity:0;animation:cut .1s steps(1) 1.5s forwards;
+  }
+  .soon .cur{display:inline-block;width:.6em;height:1.05em;background:var(--orange);
+    animation:blink 1s steps(1) infinite}
+
+  .manifesto{list-style:none;margin:1.6rem auto 0;max-width:32rem;text-align:left;
+    display:flex;flex-direction:column;gap:.5rem}
+  .manifesto li{display:flex;align-items:baseline;gap:.85rem;
+    opacity:0;animation:cut .1s steps(1) forwards}
+  .manifesto .n{font-family:"Anton",sans-serif;color:var(--orange);
+    font-size:1.05rem;min-width:1.3em;text-align:right;flex:none;
+    text-shadow:.04em .03em 0 rgba(31,174,154,.6)}
+  .manifesto .bar{font-family:"Space Mono",monospace;font-weight:700;
+    color:var(--bone);opacity:.72;letter-spacing:.05em;line-height:1;
+    font-size:clamp(.62rem,2.3vw,.95rem);white-space:nowrap;overflow:hidden;
+    text-shadow:.045em 0 0 rgba(255,90,44,.55)}
+
+  @keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(2.2vw,-1.6vh)}}
+  @keyframes judder{to{transform:translate(3%,2%)}}
+  @keyframes blink{50%{opacity:0}}
+  @keyframes cut{to{opacity:1}}
+  @keyframes glitch{
+    0%,92%,100%{text-shadow:.06em .04em 0 var(--orange),-.05em -.03em 0 var(--teal);transform:translate(0)}
+    93%{text-shadow:-.08em 0 0 var(--pink),.07em 0 0 var(--teal);transform:translate(-2px,1px)}
+    95%{text-shadow:.09em -.02em 0 var(--orange),-.06em .03em 0 var(--pink);transform:translate(2px,-1px)}
+    97%{text-shadow:.06em .04em 0 var(--orange),-.05em -.03em 0 var(--teal);transform:translate(0)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important}
+    .tag,.line,.soon,.manifesto li{opacity:1}
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <svg class="space" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <!-- dither pattern used to shade planet terminators -->
+      <pattern id="dot" width="5" height="5" patternUnits="userSpaceOnUse">
+        <rect width="5" height="5" fill="transparent"/>
+        <circle cx="1.2" cy="1.2" r="1.2" fill="#0c0e17"/>
+      </pattern>
+      <pattern id="dotfine" width="3" height="3" patternUnits="userSpaceOnUse">
+        <circle cx="0.8" cy="0.8" r="0.8" fill="#0c0e17"/>
+      </pattern>
+      <radialGradient id="sun" cx="78%" cy="22%" r="60%">
+        <stop offset="0%" stop-color="#ffd27a"/>
+        <stop offset="22%" stop-color="#ff7a30"/>
+        <stop offset="45%" stop-color="#ff5a2c"/>
+        <stop offset="46%" stop-color="transparent"/>
+      </radialGradient>
+    </defs>
+    <!-- distant sun flare -->
+    <circle cx="1124" cy="198" r="640" fill="url(#sun)" opacity="0.5"/>
+    <circle cx="1124" cy="198" r="34" fill="#ffe6a8"/>
+    <circle cx="1124" cy="198" r="60" fill="none" stroke="#ff7a30" stroke-width="2" opacity=".6"/>
+
+    <!-- scattered stars injected by JS into this group -->
+    <g id="stars"></g>
+  </svg>
+
+  <!-- BIG planet -->
+  <svg class="pl big" viewBox="0 0 400 400" aria-hidden="true">
+    <circle cx="200" cy="200" r="190" fill="#1c2b3a"/>
+    <circle cx="200" cy="200" r="190" fill="#2a4a5e"/>
+    <clipPath id="cBig"><circle cx="200" cy="200" r="190"/></clipPath>
+    <g clip-path="url(#cBig)">
+      <!-- lit side glow -->
+      <circle cx="120" cy="120" r="230" fill="#3f6e7e"/>
+      <circle cx="90" cy="95" r="150" fill="#6fae9e"/>
+      <!-- dithered terminator into shadow -->
+      <circle cx="300" cy="300" r="280" fill="url(#dot)" opacity=".9"/>
+      <circle cx="340" cy="330" r="260" fill="#0c0e17" opacity=".85"/>
+      <!-- surface bands -->
+      <ellipse cx="200" cy="150" rx="200" ry="16" fill="#173043" opacity=".5"/>
+      <ellipse cx="200" cy="240" rx="200" ry="22" fill="#173043" opacity=".4"/>
+      <circle cx="150" cy="180" r="26" fill="url(#dotfine)" opacity=".5"/>
+    </g>
+    <circle cx="200" cy="200" r="189" fill="none" stroke="#0c0e17" stroke-width="2"/>
+  </svg>
+
+  <!-- MID ringed planet -->
+  <svg class="pl mid" viewBox="0 0 300 200" aria-hidden="true">
+    <ellipse cx="150" cy="100" rx="135" ry="34" fill="none" stroke="#ff5a2c" stroke-width="8" opacity=".55"/>
+    <clipPath id="cMid"><circle cx="150" cy="100" r="62"/></clipPath>
+    <circle cx="150" cy="100" r="62" fill="#b8482a"/>
+    <g clip-path="url(#cMid)">
+      <circle cx="120" cy="72" r="60" fill="#ff7a30"/>
+      <circle cx="105" cy="62" r="34" fill="#ffd27a"/>
+      <circle cx="200" cy="150" r="90" fill="url(#dot)" opacity=".9"/>
+      <circle cx="220" cy="160" r="80" fill="#0c0e17" opacity=".8"/>
+    </g>
+    <circle cx="150" cy="100" r="62" fill="none" stroke="#0c0e17" stroke-width="2"/>
+    <ellipse cx="150" cy="100" rx="135" ry="34" fill="none" stroke="#ff5a2c" stroke-width="3"
+      stroke-dasharray="200 400" opacity=".9" transform="rotate(0 150 100)"/>
+  </svg>
+
+  <!-- SMALL moon -->
+  <svg class="pl small" viewBox="0 0 120 120" aria-hidden="true">
+    <clipPath id="cSm"><circle cx="60" cy="60" r="52"/></clipPath>
+    <circle cx="60" cy="60" r="52" fill="#7c8a9c"/>
+    <g clip-path="url(#cSm)">
+      <circle cx="42" cy="44" r="48" fill="#cdd6df"/>
+      <circle cx="88" cy="84" r="70" fill="url(#dotfine)" opacity=".9"/>
+      <circle cx="96" cy="92" r="60" fill="#0c0e17" opacity=".8"/>
+      <circle cx="48" cy="56" r="8" fill="#5a6776" opacity=".6"/>
+      <circle cx="70" cy="40" r="5" fill="#5a6776" opacity=".6"/>
+    </g>
+    <circle cx="60" cy="60" r="52" fill="none" stroke="#0c0e17" stroke-width="2"/>
+  </svg>
+
+  <div class="dither"></div>
+  <div class="dither coarse"></div>
+
+  <main>
+    <h1>Emergence</h1>
+    <ol class="manifesto">
+      <li style="animation-delay:1.2s"><span class="n">1</span><span class="bar">##################################</span></li>
+      <li style="animation-delay:1.32s"><span class="n">2</span><span class="bar">#############################</span></li>
+      <li style="animation-delay:1.44s"><span class="n">3</span><span class="bar">#######################################</span></li>
+      <li style="animation-delay:1.56s"><span class="n">4</span><span class="bar">################################</span></li>
+      <li style="animation-delay:1.68s"><span class="n">5</span><span class="bar">#######################</span></li>
+    </ol>
+    <div class="soon">Soon<span class="cur"></span></div>
+  </main>
+
+  <div class="vig"></div>
+  <div class="grain"></div>
+
+  <script>
+    // scatter dithered stars
+    const g=document.getElementById('stars');
+    const NS='http://www.w3.org/2000/svg';
+    for(let i=0;i<150;i++){
+      const c=document.createElementNS(NS,'rect');
+      const x=Math.random()*1440, y=Math.random()*900;
+      const s=Math.random()<.85?1:2;
+      c.setAttribute('x',x);c.setAttribute('y',y);
+      c.setAttribute('width',s);c.setAttribute('height',s);
+      c.setAttribute('fill', Math.random()<.2 ? '#ff5a2c' : '#e9e2cf');
+      c.setAttribute('opacity', (0.25+Math.random()*0.65).toFixed(2));
+      g.appendChild(c);
+    }
+
+    // corrupt the manifesto bars — flickering encrypted-data feel
+    const glyphs='█▓▒░##';
+    const bars=document.querySelectorAll('.bar');
+    bars.forEach(b=>b.dataset.orig=b.textContent);
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+      setInterval(()=>{
+        bars.forEach(b=>{
+          const arr=b.dataset.orig.split('');
+          const hits=1+Math.floor(Math.random()*3);
+          for(let k=0;k<hits;k++){
+            const i=Math.floor(Math.random()*arr.length);
+            arr[i]=glyphs[Math.floor(Math.random()*glyphs.length)];
+          }
+          b.textContent=arr.join('');
+        });
+      },200);
+    }
+  </script>
+</body>
+</html>
