@@ -122,8 +122,7 @@
     border-bottom:1px solid rgba(26,20,16,.12);
   }
   .sp-row{ display:flex; align-items:center; height:32px; position:relative; }
-  .sp-row.data-row, .sp-row.param-row{ justify-content:space-between; }
-  .sp-row.inst-row{ gap:10px; }
+  .sp-row.data-row, .sp-row.param-row, .sp-row.inst-row{ justify-content:space-between; }
   .sp-lbl{ font:400 9px/1 "Space Mono",monospace; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); user-select:none; }
   .sp-lbl.lit{ font-weight:700; }
   .sp-dot{
@@ -234,30 +233,34 @@
         <div class="sp-row data-row"><span class="sp-lbl" id="lbl-colorRatio">color ratio</span>   <div class="sp-dot" id="dot-colorRatio-out"  data-out="colorRatio"></div></div>
       </div>
 
-      <!-- col 2: musical parameters -->
-      <div class="sp-col">
-        <div class="sp-col-head">Musical parameter</div>
-        <div class="sp-row param-row"><div class="sp-dot" id="dot-filterCutoff-in" data-in="filterCutoff"></div><span class="sp-lbl">filter cutoff</span><div class="sp-dot" id="dot-filterCutoff-out" data-out="filterCutoff-p"></div></div>
-        <div class="sp-row param-row"><div class="sp-dot" id="dot-volume-in"       data-in="volume"></div>      <span class="sp-lbl">volume</span>       <div class="sp-dot" id="dot-volume-out"       data-out="volume-p"></div></div>
-        <div class="sp-row param-row"><div class="sp-dot" id="dot-pitch-in"        data-in="pitch"></div>       <span class="sp-lbl">pitch</span>        <div class="sp-dot" id="dot-pitch-out"        data-out="pitch-p"></div></div>
-        <div class="sp-row param-row"><div class="sp-dot" id="dot-reverbWet-in"    data-in="reverbWet"></div>   <span class="sp-lbl">reverb</span>       <div class="sp-dot" id="dot-reverbWet-out"    data-out="reverbWet-p"></div></div>
-        <div class="sp-row param-row"><div class="sp-dot" id="dot-panning-in"      data-in="panning"></div>     <span class="sp-lbl">panning</span>      <div class="sp-dot" id="dot-panning-out"      data-out="panning-p"></div></div>
-        <div class="sp-row param-row"><div class="sp-dot" id="dot-timbre-in"       data-in="timbre"></div>      <span class="sp-lbl">timbre</span>       <div class="sp-dot" id="dot-timbre-out"       data-out="timbre-p"></div></div>
-        <div class="sp-row param-row"><div class="sp-dot" id="dot-noteOn-in"       data-in="noteOn"></div>      <span class="sp-lbl">note trigger</span> <div class="sp-dot" id="dot-noteOn-out"       data-out="noteOn-p"></div></div>
-      </div>
-
-      <!-- col 3: instruments -->
+      <!-- col 2: instruments -->
       <div class="sp-col">
         <div class="sp-col-head">Instrument</div>
-        <div class="sp-row inst-row"><div class="sp-dot" id="dot-pad-in"   data-in="pad"></div>  <span class="sp-lbl">pad synth</span></div>
-        <div class="sp-row inst-row"><div class="sp-dot" id="dot-pluck-in" data-in="pluck"></div><span class="sp-lbl">pluck</span></div>
-        <div class="sp-row inst-row"><div class="sp-dot" id="dot-bass-in"  data-in="bass"></div> <span class="sp-lbl">bass drone</span></div>
-        <div class="sp-row inst-row"><div class="sp-dot" id="dot-all-in"   data-in="all"></div>  <span class="sp-lbl">— all —</span></div>
+        <div class="sp-row inst-row"><div class="sp-dot" id="dot-pad-in"   data-in="pad"></div>  <span class="sp-lbl">pad synth</span> <div class="sp-dot" id="dot-pad-out"   data-out="pad-p"></div></div>
+        <div class="sp-row inst-row"><div class="sp-dot" id="dot-pluck-in" data-in="pluck"></div><span class="sp-lbl">pluck</span>     <div class="sp-dot" id="dot-pluck-out" data-out="pluck-p"></div></div>
+        <div class="sp-row inst-row"><div class="sp-dot" id="dot-bass-in"  data-in="bass"></div> <span class="sp-lbl">bass drone</span><div class="sp-dot" id="dot-bass-out"  data-out="bass-p"></div></div>
+        <div class="sp-row inst-row"><div class="sp-dot" id="dot-fat-in"   data-in="fat"></div>  <span class="sp-lbl">fat synth</span> <div class="sp-dot" id="dot-fat-out"   data-out="fat-p"></div></div>
+        <div class="sp-row inst-row"><div class="sp-dot" id="dot-all-in"   data-in="all"></div>  <span class="sp-lbl">— all —</span>  <div class="sp-dot" id="dot-all-out"   data-out="all-p"></div></div>
+      </div>
+
+      <!-- col 3: musical parameters -->
+      <div class="sp-col">
+        <div class="sp-col-head">Musical parameter</div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-filterCutoff-in" data-in="filterCutoff"></div><span class="sp-lbl">filter cutoff</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-volume-in"       data-in="volume"></div>      <span class="sp-lbl">volume</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-pitch-in"        data-in="pitch"></div>       <span class="sp-lbl">pitch</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-reverbWet-in"    data-in="reverbWet"></div>   <span class="sp-lbl">reverb</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-panning-in"      data-in="panning"></div>     <span class="sp-lbl">panning</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-timbre-in"       data-in="timbre"></div>      <span class="sp-lbl">timbre</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-noteOn-in"       data-in="noteOn"></div>      <span class="sp-lbl">note trigger</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-lpCutoff-in"     data-in="lpCutoff"></div>    <span class="sp-lbl">lp filter</span></div>
+        <div class="sp-row param-row"><div class="sp-dot" id="dot-hpCutoff-in"     data-in="hpCutoff"></div>    <span class="sp-lbl">hp filter</span></div>
       </div>
 
       <svg id="sono-svg" xmlns="http://www.w3.org/2000/svg"></svg>
 
       <div id="sono-footer">
+        <button id="btn-unplug"   class="sono-btn" disabled>unplug all</button>
         <button id="btn-save-cab" class="sono-btn" disabled>save ↓</button>
         <button id="btn-load-cab" class="sono-btn" disabled>load ↑</button>
       </div>
@@ -498,8 +501,10 @@
     {id:'pitch',range:[36,72]},           {id:'reverbWet',range:[0,0.85]},
     {id:'panning',range:[-1,1]},          {id:'timbre',range:[0,1]},
     {id:'noteOn',range:[0,1]},
+    {id:'lpCutoff',range:[200,20000]},
+    {id:'hpCutoff',range:[20,2000]},
   ];
-  var INST_IDS = ['pad','pluck','bass','all'];
+  var INST_IDS = ['pad','pluck','bass','fat','all'];
   var TR_LIST  = ['linear','log','exp','invert'];
 
   var sonoOn=false, sonoReady=false, sonoAvgW=10;
@@ -517,17 +522,45 @@
   var sonoPatches = DEFAULT_PATCHES.map(function(p){ return mkPatch(p[0],p[1],p[2],p[3]); });
 
   /* ── Tone.js nodes ── */
-  var tMaster, tPadSynth, tPadFilter, tPadReverb, tPadPanner;
-  var tPluck, tPluckRev, tPluckPan;
+  var tMaster, tGlobalLP, tGlobalHP;
+  var tPadSynth, tPadFilter, tPadReverb, tPadPanner;
+  var tPluck, tPluckDelay, tPluckRev, tPluckPan;
   var tBass, tBassFilter, tBassPan;
+  var tFatSynth, tFatChorus, tFatFilter, tFatPanner;
   var tRecorder=null, isRecording=false;
-  var PAD_CHORDS=[['C3','G3','E4'],['D3','A3','F#4'],['E3','B3','G4'],['G3','D4','B4'],['A3','E4','C5']];
+  // Minor / Phrygian voicings — sparse → dense with cluster count
+  var PAD_CHORDS = [
+    ['A2','E3','A3'],     // open fifth — hollow, very sparse
+    ['A2','E3','C4'],     // Am
+    ['D3','A3','F4'],     // Dm
+    ['F3','C4','A4'],     // F maj — ♭VI in Am, dark wave staple
+    ['G3','D4','B4'],     // G maj — ♭VII
+    ['Bb2','F3','D4'],    // B♭ maj — ♭II, Phrygian characteristic
+    ['E3','B3','G4'],     // Em
+    ['A2','E3','G4'],     // Am7 — rich, dense
+  ];
+  var FAT_CHORDS = [      // lower register counterpart for fat synth
+    ['A1','E2','A2'],
+    ['A1','C2','E2'],
+    ['D2','F2','A2'],
+    ['F1','C2','F2'],
+    ['G1','D2','G2'],
+    ['Bb1','F2','Bb2'],
+    ['E2','G2','B2'],
+    ['A1','E2','G2'],
+  ];
   var padChordIdx=-1, lastChordMs=0;
 
   function sonoInit(){
     if(sonoReady) return;
-    tMaster=new Tone.Volume(-12).toDestination();
 
+    // Global signal chain: tMaster → LP → HP → Destination
+    tMaster   = new Tone.Volume(-12);
+    tGlobalLP = new Tone.Filter(20000,'lowpass');
+    tGlobalHP = new Tone.Filter(20,'highpass');
+    tMaster.connect(tGlobalLP); tGlobalLP.connect(tGlobalHP); tGlobalHP.toDestination();
+
+    // Pad — warm triangle, slow sustain
     tPadFilter=new Tone.Filter(800,'lowpass');
     tPadReverb=new Tone.Reverb({decay:4,wet:0.3}); tPadReverb.generate();
     tPadPanner=new Tone.Panner(0);
@@ -535,39 +568,57 @@
     tPadSynth.connect(tPadFilter); tPadFilter.connect(tPadPanner); tPadPanner.connect(tPadReverb); tPadReverb.connect(tMaster);
     setTimeout(function(){ tPadSynth.triggerAttack(PAD_CHORDS[0]); padChordIdx=0; },200);
 
+    // Pluck — Karplus-Strong with tape echo
+    tPluckDelay=new Tone.FeedbackDelay('8n',0.35);
     tPluckRev=new Tone.Reverb({decay:1.2,wet:0.2}); tPluckRev.generate();
     tPluckPan=new Tone.Panner(0);
     tPluck=new Tone.PluckSynth({attackNoise:1,dampening:4000,resonance:0.96,volume:-20});
-    tPluck.connect(tPluckPan); tPluckPan.connect(tPluckRev); tPluckRev.connect(tMaster);
+    tPluck.connect(tPluckPan); tPluckPan.connect(tPluckDelay); tPluckDelay.connect(tPluckRev); tPluckRev.connect(tMaster);
 
+    // Bass drone — sawtooth
     tBassFilter=new Tone.Filter(350,'lowpass');
     tBassPan=new Tone.Panner(0);
     tBass=new Tone.Synth({oscillator:{type:'sawtooth'},envelope:{attack:0.9,decay:0.1,sustain:0.95,release:2},volume:-30});
     tBass.connect(tBassFilter); tBassFilter.connect(tBassPan); tBassPan.connect(tMaster);
     setTimeout(function(){ tBass.triggerAttack('C2'); },400);
 
-    tRecorder=new Tone.Recorder(); tMaster.connect(tRecorder);
+    // Fat cold synth — detuned fatsawtooth + chorus (dark wave signature)
+    tFatChorus=new Tone.Chorus(3,2.5,0.6).start();
+    tFatFilter=new Tone.Filter(3000,'lowpass');
+    tFatPanner=new Tone.Panner(0);
+    tFatSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'fatsawtooth',spread:25,count:3},envelope:{attack:0.3,decay:0.2,sustain:0.7,release:1.8},volume:-24});
+    tFatSynth.connect(tFatChorus); tFatChorus.connect(tFatFilter); tFatFilter.connect(tFatPanner); tFatPanner.connect(tMaster);
+    setTimeout(function(){ tFatSynth.triggerAttack(FAT_CHORDS[0]); },350);
+
+    // Recorder taps after global filters
+    tRecorder=new Tone.Recorder(); tGlobalHP.connect(tRecorder);
     sonoReady=true;
   }
 
   function sonoSilence(){
     if(!sonoReady) return;
     tMaster.volume.rampTo(-96,0.06);
-    tPadSynth.releaseAll(); tBass.triggerRelease();
+    tPadSynth.releaseAll(); tFatSynth.releaseAll(); tBass.triggerRelease();
   }
   function sonoResume(){
     if(!sonoReady) return;
     var vol=sonoPatches.length>0 ? parseInt(document.getElementById('sono-vol').value) : -96;
     tMaster.volume.rampTo(vol,0.15);
-    tPadSynth.triggerAttack(PAD_CHORDS[Math.max(0,padChordIdx)]);
+    var idx=Math.max(0,padChordIdx);
+    tPadSynth.triggerAttack(PAD_CHORDS[idx]);
+    tFatSynth.triggerAttack(FAT_CHORDS[idx]);
     tBass.triggerAttack('C2');
   }
   function sonoReset(){
     if(!sonoOn||!sonoReady) return;
     DS.forEach(function(d){ sonoHist[d.id]=[]; sonoVal[d.id]=0.5; });
     padChordIdx=-1; lastChordMs=0;
-    tPadSynth.releaseAll(); tBass.triggerRelease();
-    setTimeout(function(){ tPadSynth.triggerAttack(PAD_CHORDS[0]); padChordIdx=0; tBass.triggerAttack('C2'); },INTRO_PAUSE+200);
+    tPadSynth.releaseAll(); tFatSynth.releaseAll(); tBass.triggerRelease();
+    setTimeout(function(){
+      tPadSynth.triggerAttack(PAD_CHORDS[0]); padChordIdx=0;
+      tFatSynth.triggerAttack(FAT_CHORDS[0]);
+      tBass.triggerAttack('C2');
+    },INTRO_PAUSE+200);
   }
 
   /* ── smoothing ── */
@@ -621,11 +672,13 @@
       case 'filterCutoff':
         if(affects(inst,'pad'))  tPadFilter.frequency.rampTo(m,ramp);
         if(affects(inst,'bass')) tBassFilter.frequency.rampTo(m,ramp);
+        if(affects(inst,'fat'))  tFatFilter.frequency.rampTo(m,ramp);
         break;
       case 'volume':
         if(affects(inst,'pad'))   tPadSynth.volume.rampTo(m,ramp);
         if(affects(inst,'bass'))  tBass.volume.rampTo(m,ramp);
         if(affects(inst,'pluck')) tPluck.volume.rampTo(m,ramp);
+        if(affects(inst,'fat'))   tFatSynth.volume.rampTo(m,ramp);
         break;
       case 'pitch':
         if(affects(inst,'bass')) tBass.frequency.rampTo(Tone.Frequency(Math.round(m),'midi').toFrequency(),0.6);
@@ -638,9 +691,17 @@
         if(affects(inst,'pad'))   tPadPanner.pan.rampTo(m,ramp);
         if(affects(inst,'pluck')) tPluckPan.pan.rampTo(m,ramp);
         if(affects(inst,'bass'))  tBassPan.pan.rampTo(m,ramp);
+        if(affects(inst,'fat'))   tFatPanner.pan.rampTo(m,ramp);
         break;
       case 'timbre':
         tPadSynth.set({detune:v*18});
+        tFatSynth.set({oscillator:{spread:v*60}});
+        break;
+      case 'lpCutoff':
+        tGlobalLP.frequency.rampTo(m,ramp);
+        break;
+      case 'hpCutoff':
+        tGlobalHP.frequency.rampTo(m,ramp);
         break;
       case 'noteOn':
         if(raw&&raw.birthRaw>0.04){
@@ -657,8 +718,9 @@
     var idx=Math.min(Math.floor(sonoVal.clusterCount*PAD_CHORDS.length),PAD_CHORDS.length-1);
     if(idx===padChordIdx) return;
     padChordIdx=idx; lastChordMs=now;
-    tPadSynth.releaseAll('+0.7');
-    var chord=PAD_CHORDS[idx]; setTimeout(function(){ tPadSynth.triggerAttack(chord); },850);
+    tPadSynth.releaseAll('+0.7'); tFatSynth.releaseAll('+0.7');
+    var pc=PAD_CHORDS[idx], fc=FAT_CHORDS[idx];
+    setTimeout(function(){ tPadSynth.triggerAttack(pc); tFatSynth.triggerAttack(fc); },850);
   }
 
   function sonoUpdate(prevGrid){
@@ -687,7 +749,10 @@
   var btnRandom =document.getElementById('btn-random');
   var btnSaveCab=document.getElementById('btn-save-cab');
   var btnLoadCab=document.getElementById('btn-load-cab');
-  function setSonoBtns(on){ [recBtn,btnDefault,btnRandom,btnSaveCab,btnLoadCab].forEach(function(b){b.disabled=!on;}); }
+  var btnUnplug =document.getElementById('btn-unplug');
+  function setSonoBtns(on){ [recBtn,btnDefault,btnRandom,btnSaveCab,btnLoadCab,btnUnplug].forEach(function(b){b.disabled=!on;}); }
+
+  btnUnplug.addEventListener('click',function(){ sonoPatches=[]; drawAllCables(); });
 
   btnDefault.addEventListener('click',defaultPatches);
   btnRandom.addEventListener('click',randomPatches);
@@ -780,17 +845,18 @@
   }
 
   function drawPatch(patch){
-    var fromDot=document.getElementById('dot-'+patch.from+'-out');
-    var toDot  =document.getElementById('dot-'+patch.to+'-in');
-    if(!fromDot||!toDot) return;
+    var fromDot=document.getElementById('dot-'+patch.from+'-out');   // data out
+    var instDot=document.getElementById('dot-'+patch.inst+'-in');    // instrument in
+    if(!fromDot||!instDot) return;
     var old=document.getElementById('cable-'+patch.id); if(old) old.remove();
 
     var g=svgNode('g',{id:'cable-'+patch.id});
-    var p1=getDotPos(fromDot), p2=getDotPos(toDot);
+    var p1=getDotPos(fromDot), p2=getDotPos(instDot);
 
+    // orange cable: data → instrument
     g.appendChild(svgNode('path',{d:bezier(p1.x,p1.y,p2.x,p2.y),stroke:'#d97647','stroke-width':'2',fill:'none',opacity:'0.85'}));
 
-    // transform badge
+    // transform badge at midpoint of orange cable
     var mx=(p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
     g.appendChild(svgNode('rect',{x:mx-24,y:my-9,width:48,height:18,rx:3,fill:'#f5f3ea',stroke:'#1a1410','stroke-width':'1.5'}));
     var txt=svgNode('text',{x:mx,y:my+4,'text-anchor':'middle','font-family':'"Space Mono",monospace','font-size':'8','font-weight':'700',fill:'#1a1410','letter-spacing':'0.05em'});
@@ -798,19 +864,17 @@
     var hit=svgNode('rect',{x:mx-24,y:my-9,width:48,height:18,fill:'transparent',class:'cbadge-hit'});
     hit.dataset.pid=patch.id; g.appendChild(hit);
 
-    // dashed instrument cable
-    if(patch.inst&&patch.inst!=='all'){
-      var paramOut=document.getElementById('dot-'+patch.to+'-out');
-      var instIn  =document.getElementById('dot-'+patch.inst+'-in');
-      if(paramOut&&instIn){
-        var p3=getDotPos(paramOut), p4=getDotPos(instIn);
-        g.appendChild(svgNode('path',{d:bezier(p3.x,p3.y,p4.x,p4.y),stroke:'rgba(26,20,16,0.45)','stroke-width':'1.5','stroke-dasharray':'5,3',fill:'none'}));
-        instIn.classList.add('lit');
-      }
+    // dashed cable: instrument out → parameter in
+    var instOut =document.getElementById('dot-'+patch.inst+'-out');
+    var paramIn =document.getElementById('dot-'+patch.to+'-in');
+    if(instOut&&paramIn){
+      var p3=getDotPos(instOut), p4=getDotPos(paramIn);
+      g.appendChild(svgNode('path',{d:bezier(p3.x,p3.y,p4.x,p4.y),stroke:'rgba(26,20,16,0.45)','stroke-width':'1.5','stroke-dasharray':'5,3',fill:'none'}));
+      paramIn.classList.add('lit');
     }
 
     svgEl.appendChild(g);
-    fromDot.classList.add('lit'); toDot.classList.add('lit');
+    fromDot.classList.add('lit'); instDot.classList.add('lit');
     var lbl=document.getElementById('lbl-'+patch.from); if(lbl) lbl.classList.add('lit');
   }
 
@@ -854,11 +918,18 @@
     var tgt=document.elementFromPoint(cx,cy); if(!tgt) return;
     var tDot=tgt.closest('[data-in]'); if(!tDot) return;
     var destIn=tDot.dataset.in;
-    if(DS.some(function(d){return d.id===srcOut;}) && MP.some(function(m){return m.id===destIn;})){
-      sonoPatches.push(mkPatch(srcOut,destIn,'pad','linear')); drawAllCables();
-    } else if(srcOut.endsWith('-p') && INST_IDS.indexOf(destIn)>=0){
-      var paramId=srcOut.replace('-p','');
-      sonoPatches.forEach(function(p){ if(p.to===paramId) p.inst=destIn; }); drawAllCables();
+    var srcIsData = DS.some(function(d){return d.id===srcOut;});
+    var srcIsInst = srcOut.endsWith('-p') && INST_IDS.indexOf(srcOut.replace('-p',''))>=0;
+    var destIsInst  = INST_IDS.indexOf(destIn)>=0;
+    var destIsParam = MP.some(function(m){return m.id===destIn;});
+
+    if(srcIsData && destIsInst){
+      // data → instrument: create patch with default parameter
+      sonoPatches.push(mkPatch(srcOut, 'filterCutoff', destIn, 'linear')); drawAllCables();
+    } else if(srcIsInst && destIsParam){
+      // instrument → parameter: assign parameter to all patches for this instrument
+      var instId=srcOut.replace('-p','');
+      sonoPatches.forEach(function(p){ if(p.inst===instId) p.to=destIn; }); drawAllCables();
     }
   }
 
@@ -885,10 +956,12 @@
     if(cDrag) return;
     var dot=e.target.closest('[data-in]'); if(!dot||!dot.classList.contains('lit')) return;
     var destId=dot.dataset.in;
-    if(MP.some(function(m){return m.id===destId;})){
+    if(INST_IDS.indexOf(destId)>=0){
+      // clicking an instrument port removes all patches routed to it
+      sonoPatches=sonoPatches.filter(function(p){return p.inst!==destId;});
+    } else if(MP.some(function(m){return m.id===destId;})){
+      // clicking a parameter port removes the parameter assignment
       sonoPatches=sonoPatches.filter(function(p){return p.to!==destId;});
-    } else if(INST_IDS.indexOf(destId)>=0){
-      sonoPatches.forEach(function(p){ if(p.inst===destId) p.inst='all'; });
     }
     drawAllCables();
   });
