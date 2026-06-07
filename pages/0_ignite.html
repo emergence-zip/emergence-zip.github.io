@@ -562,15 +562,16 @@
 
     // Pad — warm triangle, slow sustain
     tPadFilter=new Tone.Filter(800,'lowpass');
-    tPadReverb=new Tone.Reverb({decay:4,wet:0.3}); tPadReverb.generate();
+    tPadReverb=new Tone.Reverb({decay:4,wet:0.3});
+    try{ tPadReverb.generate(); }catch(e){}
     tPadPanner=new Tone.Panner(0);
     tPadSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'triangle'},envelope:{attack:1.4,decay:0.4,sustain:0.82,release:3},volume:-18});
     tPadSynth.connect(tPadFilter); tPadFilter.connect(tPadPanner); tPadPanner.connect(tPadReverb); tPadReverb.connect(tMaster);
-    setTimeout(function(){ tPadSynth.triggerAttack(PAD_CHORDS[0]); padChordIdx=0; },200);
 
     // Pluck — Karplus-Strong with tape echo
     tPluckDelay=new Tone.FeedbackDelay('8n',0.35);
-    tPluckRev=new Tone.Reverb({decay:1.2,wet:0.2}); tPluckRev.generate();
+    tPluckRev=new Tone.Reverb({decay:1.2,wet:0.2});
+    try{ tPluckRev.generate(); }catch(e){}
     tPluckPan=new Tone.Panner(0);
     tPluck=new Tone.PluckSynth({attackNoise:1,dampening:4000,resonance:0.96,volume:-20});
     tPluck.connect(tPluckPan); tPluckPan.connect(tPluckDelay); tPluckDelay.connect(tPluckRev); tPluckRev.connect(tMaster);
@@ -580,19 +581,22 @@
     tBassPan=new Tone.Panner(0);
     tBass=new Tone.Synth({oscillator:{type:'sawtooth'},envelope:{attack:0.9,decay:0.1,sustain:0.95,release:2},volume:-30});
     tBass.connect(tBassFilter); tBassFilter.connect(tBassPan); tBassPan.connect(tMaster);
-    setTimeout(function(){ tBass.triggerAttack('C2'); },400);
 
-    // Fat cold synth — detuned fatsawtooth + chorus (dark wave signature)
+    // Fat cold synth — detuned fatsawtooth + chorus (falls back to sawtooth on unsupported browsers)
     tFatChorus=new Tone.Chorus(3,2.5,0.6).start();
     tFatFilter=new Tone.Filter(3000,'lowpass');
     tFatPanner=new Tone.Panner(0);
-    tFatSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'fatsawtooth',spread:25,count:3},envelope:{attack:0.3,decay:0.2,sustain:0.7,release:1.8},volume:-24});
+    var fatOscType='fatsawtooth';
+    try{ new OscillatorNode(Tone.context.rawContext,{type:'sawtooth'}); }catch(e){ fatOscType='sawtooth'; }
+    tFatSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:fatOscType,spread:25,count:3},envelope:{attack:0.3,decay:0.2,sustain:0.7,release:1.8},volume:-24});
     tFatSynth.connect(tFatChorus); tFatChorus.connect(tFatFilter); tFatFilter.connect(tFatPanner); tFatPanner.connect(tMaster);
-    setTimeout(function(){ tFatSynth.triggerAttack(FAT_CHORDS[0]); },350);
 
-    // Recorder taps after global filters
-    tRecorder=new Tone.Recorder(); tGlobalHP.connect(tRecorder);
+    // Mark ready BEFORE recorder so a recorder failure doesn't break audio
     sonoReady=true;
+
+    // Recorder — optional, not supported on all mobile browsers
+    try{ tRecorder=new Tone.Recorder(); tGlobalHP.connect(tRecorder); }
+    catch(e){ console.warn('Audio recorder unavailable:',e); }
   }
 
   function sonoSilence(){
@@ -602,12 +606,16 @@
   }
   function sonoResume(){
     if(!sonoReady) return;
+    // Ensure AudioContext is running (iOS suspends it on page hide / between async calls)
+    Tone.context.resume();
     var vol=sonoPatches.length>0 ? parseInt(document.getElementById('sono-vol').value) : -96;
-    tMaster.volume.rampTo(vol,0.15);
+    tMaster.volume.rampTo(vol,0.2);
     var idx=Math.max(0,padChordIdx);
-    tPadSynth.triggerAttack(PAD_CHORDS[idx]);
-    tFatSynth.triggerAttack(FAT_CHORDS[idx]);
-    tBass.triggerAttack('C2');
+    // Small offset so notes schedule after context is confirmed running
+    var t='+0.1';
+    tPadSynth.triggerAttack(PAD_CHORDS[idx],t);
+    tFatSynth.triggerAttack(FAT_CHORDS[idx],t);
+    tBass.triggerAttack('C2',t);
   }
   function sonoReset(){
     if(!sonoOn||!sonoReady) return;
@@ -968,7 +976,9 @@
 
   /* ── iOS: resume AudioContext on page visibility restore ── */
   document.addEventListener('visibilitychange',function(){
-    if(document.visibilityState==='visible'&&sonoOn) Tone.start();
+    if(document.visibilityState==='visible'&&sonoOn){
+      Tone.start().then(function(){ if(sonoReady) Tone.context.resume(); });
+    }
   });
 
   /* ── sonification toggle ── */
