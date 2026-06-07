@@ -553,79 +553,86 @@
 
   function sonoInit(){
     if(sonoReady) return;
-
-    // Global signal chain: tMaster → LP → HP → Destination
-    tMaster   = new Tone.Volume(-12);
-    tGlobalLP = new Tone.Filter(20000,'lowpass');
-    tGlobalHP = new Tone.Filter(20,'highpass');
-    tMaster.connect(tGlobalLP); tGlobalLP.connect(tGlobalHP); tGlobalHP.toDestination();
-
-    // Pad — warm triangle, slow sustain
-    tPadFilter=new Tone.Filter(800,'lowpass');
-    tPadReverb=new Tone.Reverb({decay:4,wet:0.3});
-    try{ tPadReverb.generate(); }catch(e){}
-    tPadPanner=new Tone.Panner(0);
-    tPadSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'triangle'},envelope:{attack:1.4,decay:0.4,sustain:0.82,release:3},volume:-18});
-    tPadSynth.connect(tPadFilter); tPadFilter.connect(tPadPanner); tPadPanner.connect(tPadReverb); tPadReverb.connect(tMaster);
-
-    // Pluck — Karplus-Strong with tape echo
-    tPluckDelay=new Tone.FeedbackDelay('8n',0.35);
-    tPluckRev=new Tone.Reverb({decay:1.2,wet:0.2});
-    try{ tPluckRev.generate(); }catch(e){}
-    tPluckPan=new Tone.Panner(0);
-    tPluck=new Tone.PluckSynth({attackNoise:1,dampening:4000,resonance:0.96,volume:-20});
-    tPluck.connect(tPluckPan); tPluckPan.connect(tPluckDelay); tPluckDelay.connect(tPluckRev); tPluckRev.connect(tMaster);
-
-    // Bass drone — sawtooth
-    tBassFilter=new Tone.Filter(350,'lowpass');
-    tBassPan=new Tone.Panner(0);
-    tBass=new Tone.Synth({oscillator:{type:'sawtooth'},envelope:{attack:0.9,decay:0.1,sustain:0.95,release:2},volume:-30});
-    tBass.connect(tBassFilter); tBassFilter.connect(tBassPan); tBassPan.connect(tMaster);
-
-    // Fat cold synth — detuned fatsawtooth + chorus (falls back to sawtooth on unsupported browsers)
-    tFatChorus=new Tone.Chorus(3,2.5,0.6).start();
-    tFatFilter=new Tone.Filter(3000,'lowpass');
-    tFatPanner=new Tone.Panner(0);
-    var fatOscType='fatsawtooth';
-    try{ new OscillatorNode(Tone.context.rawContext,{type:'sawtooth'}); }catch(e){ fatOscType='sawtooth'; }
-    tFatSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:fatOscType,spread:25,count:3},envelope:{attack:0.3,decay:0.2,sustain:0.7,release:1.8},volume:-24});
-    tFatSynth.connect(tFatChorus); tFatChorus.connect(tFatFilter); tFatFilter.connect(tFatPanner); tFatPanner.connect(tMaster);
-
-    // Mark ready BEFORE recorder so a recorder failure doesn't break audio
+    // Set ready immediately — any instrument that fails is skipped, rest still work
     sonoReady=true;
 
-    // Recorder — optional, not supported on all mobile browsers
-    try{ tRecorder=new Tone.Recorder(); tGlobalHP.connect(tRecorder); }
-    catch(e){ console.warn('Audio recorder unavailable:',e); }
+    // Global signal chain: tMaster → LP → HP → Destination
+    try{
+      tMaster   = new Tone.Volume(-12);
+      tGlobalLP = new Tone.Filter(20000,'lowpass');
+      tGlobalHP = new Tone.Filter(20,'highpass');
+      tMaster.connect(tGlobalLP); tGlobalLP.connect(tGlobalHP); tGlobalHP.toDestination();
+    }catch(e){ sonoReady=false; return; } // can't continue without master chain
+
+    // Pad — warm triangle, slow sustain
+    try{
+      tPadFilter=new Tone.Filter(800,'lowpass');
+      tPadReverb=new Tone.Reverb({decay:4,wet:0.3});
+      try{ tPadReverb.generate(); }catch(e){}
+      tPadPanner=new Tone.Panner(0);
+      tPadSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'triangle'},envelope:{attack:1.4,decay:0.4,sustain:0.82,release:3},volume:-18});
+      tPadSynth.connect(tPadFilter); tPadFilter.connect(tPadPanner); tPadPanner.connect(tPadReverb); tPadReverb.connect(tMaster);
+    }catch(e){ tPadSynth=null; }
+
+    // Pluck — Karplus-Strong with tape echo
+    try{
+      tPluckDelay=new Tone.FeedbackDelay('8n',0.35);
+      tPluckRev=new Tone.Reverb({decay:1.2,wet:0.2});
+      try{ tPluckRev.generate(); }catch(e){}
+      tPluckPan=new Tone.Panner(0);
+      tPluck=new Tone.PluckSynth({attackNoise:1,dampening:4000,resonance:0.96,volume:-20});
+      tPluck.connect(tPluckPan); tPluckPan.connect(tPluckDelay); tPluckDelay.connect(tPluckRev); tPluckRev.connect(tMaster);
+    }catch(e){ tPluck=null; }
+
+    // Bass drone — sawtooth
+    try{
+      tBassFilter=new Tone.Filter(350,'lowpass');
+      tBassPan=new Tone.Panner(0);
+      tBass=new Tone.Synth({oscillator:{type:'sawtooth'},envelope:{attack:0.9,decay:0.1,sustain:0.95,release:2},volume:-30});
+      tBass.connect(tBassFilter); tBassFilter.connect(tBassPan); tBassPan.connect(tMaster);
+    }catch(e){ tBass=null; }
+
+    // Fat cold synth — detuned fatsawtooth + chorus
+    try{
+      tFatChorus=new Tone.Chorus(3,2.5,0.6).start();
+      tFatFilter=new Tone.Filter(3000,'lowpass');
+      tFatPanner=new Tone.Panner(0);
+      tFatSynth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'fatsawtooth',spread:25,count:3},envelope:{attack:0.3,decay:0.2,sustain:0.7,release:1.8},volume:-24});
+      tFatSynth.connect(tFatChorus); tFatChorus.connect(tFatFilter); tFatFilter.connect(tFatPanner); tFatPanner.connect(tMaster);
+    }catch(e){ tFatSynth=null; }
+
+    // Recorder — optional
+    try{ tRecorder=new Tone.Recorder(); tGlobalHP.connect(tRecorder); }catch(e){}
   }
 
   function sonoSilence(){
     if(!sonoReady) return;
     tMaster.volume.rampTo(-96,0.06);
-    tPadSynth.releaseAll(); tFatSynth.releaseAll(); tBass.triggerRelease();
+    if(tPadSynth) tPadSynth.releaseAll();
+    if(tFatSynth) tFatSynth.releaseAll();
+    if(tBass)     tBass.triggerRelease();
   }
   function sonoResume(){
     if(!sonoReady) return;
-    // Ensure AudioContext is running (iOS suspends it on page hide / between async calls)
-    Tone.context.resume();
+    Tone.context.resume(); // kick iOS AudioContext awake
     var vol=sonoPatches.length>0 ? parseInt(document.getElementById('sono-vol').value) : -96;
     tMaster.volume.rampTo(vol,0.2);
-    var idx=Math.max(0,padChordIdx);
-    // Small offset so notes schedule after context is confirmed running
-    var t='+0.1';
-    tPadSynth.triggerAttack(PAD_CHORDS[idx],t);
-    tFatSynth.triggerAttack(FAT_CHORDS[idx],t);
-    tBass.triggerAttack('C2',t);
+    var idx=Math.max(0,padChordIdx), t='+0.1';
+    if(tPadSynth) tPadSynth.triggerAttack(PAD_CHORDS[idx],t);
+    if(tFatSynth) tFatSynth.triggerAttack(FAT_CHORDS[idx],t);
+    if(tBass)     tBass.triggerAttack('C2',t);
   }
   function sonoReset(){
     if(!sonoOn||!sonoReady) return;
     DS.forEach(function(d){ sonoHist[d.id]=[]; sonoVal[d.id]=0.5; });
     padChordIdx=-1; lastChordMs=0;
-    tPadSynth.releaseAll(); tFatSynth.releaseAll(); tBass.triggerRelease();
+    if(tPadSynth) tPadSynth.releaseAll();
+    if(tFatSynth) tFatSynth.releaseAll();
+    if(tBass)     tBass.triggerRelease();
     setTimeout(function(){
-      tPadSynth.triggerAttack(PAD_CHORDS[0]); padChordIdx=0;
-      tFatSynth.triggerAttack(FAT_CHORDS[0]);
-      tBass.triggerAttack('C2');
+      if(tPadSynth){ tPadSynth.triggerAttack(PAD_CHORDS[0]); padChordIdx=0; }
+      if(tFatSynth)  tFatSynth.triggerAttack(FAT_CHORDS[0]);
+      if(tBass)      tBass.triggerAttack('C2');
     },INTRO_PAUSE+200);
   }
 
@@ -678,32 +685,32 @@
     var v=applyTr(sonoVal[patch.from],patch.tr), m=mapRange(v,patch.to), inst=patch.inst, ramp=0.15;
     switch(patch.to){
       case 'filterCutoff':
-        if(affects(inst,'pad'))  tPadFilter.frequency.rampTo(m,ramp);
-        if(affects(inst,'bass')) tBassFilter.frequency.rampTo(m,ramp);
-        if(affects(inst,'fat'))  tFatFilter.frequency.rampTo(m,ramp);
+        if(affects(inst,'pad')  && tPadFilter)  tPadFilter.frequency.rampTo(m,ramp);
+        if(affects(inst,'bass') && tBassFilter) tBassFilter.frequency.rampTo(m,ramp);
+        if(affects(inst,'fat')  && tFatFilter)  tFatFilter.frequency.rampTo(m,ramp);
         break;
       case 'volume':
-        if(affects(inst,'pad'))   tPadSynth.volume.rampTo(m,ramp);
-        if(affects(inst,'bass'))  tBass.volume.rampTo(m,ramp);
-        if(affects(inst,'pluck')) tPluck.volume.rampTo(m,ramp);
-        if(affects(inst,'fat'))   tFatSynth.volume.rampTo(m,ramp);
+        if(affects(inst,'pad')   && tPadSynth) tPadSynth.volume.rampTo(m,ramp);
+        if(affects(inst,'bass')  && tBass)     tBass.volume.rampTo(m,ramp);
+        if(affects(inst,'pluck') && tPluck)    tPluck.volume.rampTo(m,ramp);
+        if(affects(inst,'fat')   && tFatSynth) tFatSynth.volume.rampTo(m,ramp);
         break;
       case 'pitch':
-        if(affects(inst,'bass')) tBass.frequency.rampTo(Tone.Frequency(Math.round(m),'midi').toFrequency(),0.6);
+        if(affects(inst,'bass') && tBass) tBass.frequency.rampTo(Tone.Frequency(Math.round(m),'midi').toFrequency(),0.6);
         break;
       case 'reverbWet':
-        if(affects(inst,'pad'))   tPadReverb.wet.rampTo(m,0.4);
-        if(affects(inst,'pluck')) tPluckRev.wet.rampTo(m,0.4);
+        if(affects(inst,'pad')   && tPadReverb) tPadReverb.wet.rampTo(m,0.4);
+        if(affects(inst,'pluck') && tPluckRev)  tPluckRev.wet.rampTo(m,0.4);
         break;
       case 'panning':
-        if(affects(inst,'pad'))   tPadPanner.pan.rampTo(m,ramp);
-        if(affects(inst,'pluck')) tPluckPan.pan.rampTo(m,ramp);
-        if(affects(inst,'bass'))  tBassPan.pan.rampTo(m,ramp);
-        if(affects(inst,'fat'))   tFatPanner.pan.rampTo(m,ramp);
+        if(affects(inst,'pad')   && tPadPanner) tPadPanner.pan.rampTo(m,ramp);
+        if(affects(inst,'pluck') && tPluckPan)  tPluckPan.pan.rampTo(m,ramp);
+        if(affects(inst,'bass')  && tBassPan)   tBassPan.pan.rampTo(m,ramp);
+        if(affects(inst,'fat')   && tFatPanner) tFatPanner.pan.rampTo(m,ramp);
         break;
       case 'timbre':
-        tPadSynth.set({detune:v*18});
-        tFatSynth.set({oscillator:{spread:v*60}});
+        if(tPadSynth) tPadSynth.set({detune:v*18});
+        if(tFatSynth) tFatSynth.set({oscillator:{spread:v*60}});
         break;
       case 'lpCutoff':
         tGlobalLP.frequency.rampTo(m,ramp);
@@ -712,7 +719,7 @@
         tGlobalHP.frequency.rampTo(m,ramp);
         break;
       case 'noteOn':
-        if(raw&&raw.birthRaw>0.04){
+        if(tPluck&&raw&&raw.birthRaw>0.04){
           var count=Math.min(3,Math.ceil(raw.birthRaw*12));
           for(var i=0;i<count;i++) tPluck.triggerAttack(PENTA[Math.floor(Math.random()*PENTA.length)],'+'+( i*0.06).toFixed(2));
         }
@@ -726,9 +733,13 @@
     var idx=Math.min(Math.floor(sonoVal.clusterCount*PAD_CHORDS.length),PAD_CHORDS.length-1);
     if(idx===padChordIdx) return;
     padChordIdx=idx; lastChordMs=now;
-    tPadSynth.releaseAll('+0.7'); tFatSynth.releaseAll('+0.7');
+    if(tPadSynth) tPadSynth.releaseAll('+0.7');
+    if(tFatSynth) tFatSynth.releaseAll('+0.7');
     var pc=PAD_CHORDS[idx], fc=FAT_CHORDS[idx];
-    setTimeout(function(){ tPadSynth.triggerAttack(pc); tFatSynth.triggerAttack(fc); },850);
+    setTimeout(function(){
+      if(tPadSynth) tPadSynth.triggerAttack(pc);
+      if(tFatSynth) tFatSynth.triggerAttack(fc);
+    },850);
   }
 
   function sonoUpdate(prevGrid){
@@ -824,7 +835,10 @@
       };
     });
   }
-  recBtn.addEventListener('click',function(){ if(!sonoOn) return; isRecording?stopRec():startRec(); });
+  recBtn.addEventListener('click',function(){
+    if(!sonoOn||!tRecorder){ if(!tRecorder) alert('Recording not supported on this device.'); return; }
+    isRecording?stopRec():startRec();
+  });
 
   /* ══════════════════════════════════════════════════════
      PATCH CABLE UI
