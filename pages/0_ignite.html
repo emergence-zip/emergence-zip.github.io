@@ -77,6 +77,7 @@
   #controls button{ font:inherit; color:var(--ink); background:transparent; border:2px solid var(--ink); padding:6px 14px; cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
   #controls button:hover{ background:var(--accent); color:var(--paper); border-color:var(--accent); }
   #controls .sep-line{ width:0; height:20px; border-left:1.5px solid rgba(26,20,16,.25); }
+  #controls input[type=color]{ width:26px; height:22px; padding:1px 2px; border:2px solid var(--ink); background:none; cursor:pointer; border-radius:0; }
   .val{ min-width:28px; display:inline-block; }
   .sep{ width:100%; height:0; }
 
@@ -218,6 +219,12 @@
       </label>
       <label>speed <input id="speed" type="range" min="20" max="400" value="140"><span class="val" id="speedV">140</span></label>
       <label>structure&nbsp;≥ <input id="thr" type="range" min="2" max="40" value="5"><span class="val" id="thrV">10</span></label>
+      <div class="sep"></div>
+      <label>background <input type="color" id="col-bg"     value="#f5f3ea"></label>
+      <label>dots        <input type="color" id="col-ink"    value="#1c1b17"></label>
+      <label>accent      <input type="color" id="col-accent" value="#d97647"></label>
+      <button id="col-light">light</button>
+      <button id="col-dark">dark</button>
     </div>
   </div>
 
@@ -449,6 +456,32 @@
     STRUCTURE_THRESHOLD=parseInt(this.value); document.getElementById('thrV').textContent=STRUCTURE_THRESHOLD;
     if(!running) draw();
   });
+
+  /* ---- color pickers ---- */
+  var COLOR_PRESETS = {
+    light: { bg:'#f5f3ea', ink:'#1c1b17', accent:'#d97647' },
+    dark:  { bg:'#1c1b17', ink:'#e8d8c9', accent:'#d97647' },
+  };
+  function applyColorPreset(preset){
+    poster.style.background = preset.bg;
+    INK = preset.ink;
+    ACCENT_COLOR = preset.accent;
+    document.getElementById('col-bg').value     = preset.bg;
+    document.getElementById('col-ink').value    = preset.ink;
+    document.getElementById('col-accent').value = preset.accent;
+    if(!running) draw();
+  }
+  document.getElementById('col-bg').addEventListener('input', function(){
+    poster.style.background = this.value;
+  });
+  document.getElementById('col-ink').addEventListener('input', function(){
+    INK = this.value; if(!running) draw();
+  });
+  document.getElementById('col-accent').addEventListener('input', function(){
+    ACCENT_COLOR = this.value; if(!running) draw();
+  });
+  document.getElementById('col-light').addEventListener('click', function(){ applyColorPreset(COLOR_PRESETS.light); });
+  document.getElementById('col-dark').addEventListener('click',  function(){ applyColorPreset(COLOR_PRESETS.dark);  });
   window.addEventListener('resize',function(){
     clearTimeout(window.__r);
     window.__r=setTimeout(function(){ start(); setTimeout(sonoResizeSVG,80); },200);
