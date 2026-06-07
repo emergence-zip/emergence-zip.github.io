@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- sweep-range groove on outer ring -->
+  <path d="M 21.8 98.2 A 54 54 0 1 1 98.2 98.2"
+        fill="none" stroke="#3a2010" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- outer shadow ring (represents side depth of knob) -->
+  <circle cx="60" cy="60" r="55" fill="#27150e"/>
+
+  <!-- main knob body — olive khaki -->
+  <circle cx="60" cy="60" r="50" fill="#616355"/>
+
+  <!-- highlight arc upper-left (lit from upper-left) -->
+  <path d="M 22 44 A 42 42 0 0 1 52 18" fill="none" stroke="#7e8070" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
+
+  <!-- shadow arc lower-right -->
+  <path d="M 97 74 A 42 42 0 0 1 47 100" fill="none" stroke="#27150e" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- knurling marks (grip texture on knob edge) -->
+  <line x1="60.0" y1="8.0" x2="60.0" y2="13.0" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="86.0" y1="15.0" x2="83.5" y2="19.3" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="105.0" y1="34.0" x2="100.7" y2="36.5" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="112.0" y1="60.0" x2="107.0" y2="60.0" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="105.0" y1="86.0" x2="100.7" y2="83.5" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="86.0" y1="105.0" x2="83.5" y2="100.7" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="60.0" y1="112.0" x2="60.0" y2="107.0" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="34.0" y1="105.0" x2="36.5" y2="100.7" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="15.0" y1="86.0" x2="19.3" y2="83.5" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="8.0" y1="60.0" x2="13.0" y2="60.0" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="15.0" y1="34.0" x2="19.3" y2="36.5" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="34.0" y1="15.0" x2="36.5" y2="19.3" stroke="#7a7a68" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- inner recessed plate (dark base) -->
+  <circle cx="60" cy="60" r="39" fill="#3a3c32"/>
+  <!-- inner plate surface -->
+  <circle cx="60" cy="60" r="37" fill="#525448"/>
+  <!-- inner plate subtle highlight -->
+  <path d="M 44 34 A 28 28 0 0 1 60 32" fill="none" stroke="#686a5a" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- indicator shadow (depth) -->
+  <line x1="61" y1="61" x2="61" y2="23" stroke="#5a1a10" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- indicator line — orange-red -->
+  <line x1="60" y1="60" x2="60" y2="21" stroke="#d3562e" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- indicator tip dot -->
+  <circle cx="60" cy="23" r="5.5" fill="#5a1a10"/>
+  <circle cx="60" cy="23" r="4" fill="#d3562e"/>
+  <circle cx="60" cy="23" r="2" fill="#e8703a" opacity="0.7"/>
+
+  <!-- centre hub -->
+  <circle cx="60" cy="60" r="10" fill="#27150e"/>
+  <circle cx="60" cy="60" r="7" fill="#43453b"/>
+  <circle cx="60" cy="60" r="4" fill="#616355"/>
+  <circle cx="60" cy="60" r="1.5" fill="#27150e"/>
+</svg>
