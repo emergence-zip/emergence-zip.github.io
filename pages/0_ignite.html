@@ -524,11 +524,24 @@
   /* ── Tone.js nodes ── */
   // Looping near-silent <audio> element that promotes iOS audio session to
   // "Playback" category, bypassing the hardware silent switch.
+  // Built from raw WAV bytes so it's guaranteed valid — no base64 decoding issues.
   var _iosAudio = (function(){
-    var el = document.createElement('audio');
-    el.src = 'data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-    el.loop = true;
-    el.volume = 0.001;
+    var wav = new Uint8Array([
+      0x52,0x49,0x46,0x46, 0x26,0x00,0x00,0x00, // RIFF, size=38
+      0x57,0x41,0x56,0x45,                       // WAVE
+      0x66,0x6D,0x74,0x20, 0x10,0x00,0x00,0x00, // fmt , size=16
+      0x01,0x00,           // PCM
+      0x01,0x00,           // 1 channel
+      0x44,0xAC,0x00,0x00, // 44100 Hz
+      0x88,0x58,0x01,0x00, // 88200 byte/s
+      0x02,0x00,           // block align
+      0x10,0x00,           // 16-bit
+      0x64,0x61,0x74,0x61, 0x02,0x00,0x00,0x00, // data, size=2
+      0x00,0x00            // 1 silent sample
+    ]);
+    var url = URL.createObjectURL(new Blob([wav],{type:'audio/wav'}));
+    var el  = document.createElement('audio');
+    el.src  = url; el.loop = true; el.volume = 0.001;
     el.setAttribute('playsinline','');
     return el;
   })();
