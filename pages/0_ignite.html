@@ -77,7 +77,11 @@
   #controls button{ font:inherit; color:var(--ink); background:transparent; border:2px solid var(--ink); padding:6px 14px; cursor:pointer; transition:background .15s, color .15s, border-color .15s; }
   #controls button:hover{ background:var(--accent); color:var(--paper); border-color:var(--accent); }
   #controls .sep-line{ width:0; height:20px; border-left:1.5px solid rgba(26,20,16,.25); }
-  #controls input[type=color]{ width:26px; height:22px; padding:1px 2px; border:2px solid var(--ink); background:none; cursor:pointer; border-radius:0; }
+  #color-section{ margin-left:auto; display:flex; align-items:center; gap:8px 14px; flex-wrap:wrap; }
+  .col-swatch{ display:inline-block; width:22px; height:16px; border:2px solid var(--ink); cursor:pointer; vertical-align:middle; transition:transform .12s; }
+  .col-swatch:hover{ transform:scale(1.2); }
+  /* hidden inputs anchored at right edge so picker popup opens from there */
+  .col-hidden{ position:fixed; right:16px; top:50%; width:28px; height:22px; opacity:.01; z-index:-1; border:none; padding:0; }
   .val{ min-width:28px; display:inline-block; }
   .sep{ width:100%; height:0; }
 
@@ -219,12 +223,13 @@
       </label>
       <label>speed <input id="speed" type="range" min="20" max="400" value="140"><span class="val" id="speedV">140</span></label>
       <label>structure&nbsp;≥ <input id="thr" type="range" min="2" max="40" value="5"><span class="val" id="thrV">10</span></label>
-      <div class="sep"></div>
-      <label>background <input type="color" id="col-bg"     value="#f5f3ea"></label>
-      <label>dots        <input type="color" id="col-ink"    value="#1c1b17"></label>
-      <label>accent      <input type="color" id="col-accent" value="#d97647"></label>
-      <button id="col-light">light</button>
-      <button id="col-dark">dark</button>
+      <div id="color-section">
+        <label>background <span class="col-swatch" id="swatch-bg"     style="background:#f5f3ea"></span></label>
+        <label>dots        <span class="col-swatch" id="swatch-ink"    style="background:#1c1b17"></span></label>
+        <label>accent      <span class="col-swatch" id="swatch-accent" style="background:#d97647"></span></label>
+        <button id="col-light">light</button>
+        <button id="col-dark">dark</button>
+      </div>
     </div>
   </div>
 
@@ -280,6 +285,11 @@
       <svg id="sono-svg" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
   </div>
+
+<!-- colour picker inputs anchored at right edge so their popup opens from there -->
+<input type="color" id="col-bg"     class="col-hidden" value="#f5f3ea">
+<input type="color" id="col-ink"    class="col-hidden" value="#1c1b17">
+<input type="color" id="col-accent" class="col-hidden" value="#d97647">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 <script>
@@ -462,26 +472,46 @@
     light: { bg:'#f5f3ea', ink:'#1c1b17', accent:'#d97647' },
     dark:  { bg:'#1c1b17', ink:'#e8d8c9', accent:'#d97647' },
   };
+  function setSwatch(swatchId, color){
+    document.getElementById(swatchId).style.background = color;
+  }
   function applyColorPreset(preset){
     poster.style.background = preset.bg;
-    INK = preset.ink;
-    ACCENT_COLOR = preset.accent;
+    INK = preset.ink; ACCENT_COLOR = preset.accent;
     document.getElementById('col-bg').value     = preset.bg;
     document.getElementById('col-ink').value    = preset.ink;
     document.getElementById('col-accent').value = preset.accent;
+    setSwatch('swatch-bg', preset.bg);
+    setSwatch('swatch-ink', preset.ink);
+    setSwatch('swatch-accent', preset.accent);
     if(!running) draw();
   }
+
+  // swatch clicks open the hidden input
+  ['bg','ink','accent'].forEach(function(key){
+    document.getElementById('swatch-'+key).addEventListener('click', function(){
+      document.getElementById('col-'+key).click();
+    });
+  });
+
   document.getElementById('col-bg').addEventListener('input', function(){
-    poster.style.background = this.value;
+    poster.style.background = this.value; setSwatch('swatch-bg', this.value);
   });
   document.getElementById('col-ink').addEventListener('input', function(){
-    INK = this.value; if(!running) draw();
+    INK = this.value; setSwatch('swatch-ink', this.value); if(!running) draw();
   });
   document.getElementById('col-accent').addEventListener('input', function(){
-    ACCENT_COLOR = this.value; if(!running) draw();
+    ACCENT_COLOR = this.value; setSwatch('swatch-accent', this.value); if(!running) draw();
   });
   document.getElementById('col-light').addEventListener('click', function(){ applyColorPreset(COLOR_PRESETS.light); });
   document.getElementById('col-dark').addEventListener('click',  function(){ applyColorPreset(COLOR_PRESETS.dark);  });
+
+  // close any open color picker when clicking outside it
+  document.addEventListener('mousedown', function(e){
+    if(!e.target.matches('input[type="color"]')){
+      document.querySelectorAll('input[type="color"]').forEach(function(el){ el.blur(); });
+    }
+  });
   window.addEventListener('resize',function(){
     clearTimeout(window.__r);
     window.__r=setTimeout(function(){ start(); setTimeout(sonoResizeSVG,80); },200);
@@ -599,7 +629,7 @@
 
   function sonoSilence(){
     if(!sonoReady) return;
-    tMaster.volume.rampTo(-Infinity, 0.06); // cut fast
+    tMaster.volume.rampTo(-96, 0.06); // cut fast
     tPadSynth.releaseAll();
     tBass.triggerRelease();
   }
@@ -822,7 +852,7 @@
     padChordIdx = idx; lastChordMs = now;
     tPadSynth.releaseAll('+0.7');
     var chord = PAD_CHORDS[idx];
-    Tone.getDraw().schedule(function(){ tPadSynth.triggerAttack(chord); }, '+0.85');
+    setTimeout(function(){ tPadSynth.triggerAttack(chord); }, 850);
   }
 
   /* ── main update (called from loop) ── */
@@ -1032,6 +1062,62 @@
         if(p.to===paramId) p.inst = destIn;
       });
       drawAllCables();
+    }
+  });
+
+  /* ── touch support for patch cable drag ── */
+  function touchPos(e){ var t=e.touches[0]||e.changedTouches[0]; return {clientX:t.clientX, clientY:t.clientY}; }
+
+  bodyEl.addEventListener('touchstart', function(e){
+    var dot = e.target.closest('[data-out]');
+    if(!dot) return;
+    e.preventDefault();
+    var sp = getDotPos(dot);
+    var ghost = document.createElementNS('http://www.w3.org/2000/svg','path');
+    ghost.setAttribute('stroke','#d97647'); ghost.setAttribute('stroke-width','2');
+    ghost.setAttribute('fill','none'); ghost.setAttribute('stroke-dasharray','6,3');
+    ghost.setAttribute('opacity','0.55'); ghost.id='ghost-cable';
+    svgEl.appendChild(ghost);
+    cDrag = { dot:dot, sx:sp.x, sy:sp.y, ghost:ghost };
+  }, {passive:false});
+
+  document.addEventListener('touchmove', function(e){
+    if(!cDrag) return;
+    e.preventDefault();
+    var pos = touchPos(e);
+    var sr = svgEl.getBoundingClientRect();
+    var mx = pos.clientX-sr.left, my = pos.clientY-sr.top;
+    cDrag.ghost.setAttribute('d', bezier(cDrag.sx, cDrag.sy, mx, my));
+  }, {passive:false});
+
+  document.addEventListener('touchend', function(e){
+    if(!cDrag) return;
+    var ghost = cDrag.ghost, srcOut = cDrag.dot.dataset.out;
+    cDrag = null; ghost.remove();
+    var pos = touchPos(e);
+    var tgt = document.elementFromPoint(pos.clientX, pos.clientY);
+    if(!tgt) return;
+    var tDot = tgt.closest('[data-in]');
+    if(!tDot) return;
+    var destIn = tDot.dataset.in;
+    var srcIsData  = DS.some(function(d){ return d.id===srcOut; });
+    var srcIsParam = srcOut.endsWith('-p');
+    var destIsParam = MP.some(function(m){ return m.id===destIn; });
+    var destIsInst  = INST_IDS.indexOf(destIn)>=0;
+    if(srcIsData && destIsParam){
+      sonoPatches.push(mkPatch(srcOut, destIn, 'pad', 'linear'));
+      drawAllCables();
+    } else if(srcIsParam && destIsInst){
+      var paramId = srcOut.replace('-p','');
+      sonoPatches.forEach(function(p){ if(p.to===paramId) p.inst=destIn; });
+      drawAllCables();
+    }
+  });
+
+  /* ── resume AudioContext when page regains focus (iOS suspends it) ── */
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState==='visible' && sonoOn){
+      Tone.start();
     }
   });
 
