@@ -522,6 +522,17 @@
   var sonoPatches = DEFAULT_PATCHES.map(function(p){ return mkPatch(p[0],p[1],p[2],p[3]); });
 
   /* ── Tone.js nodes ── */
+  // Looping near-silent <audio> element that promotes iOS audio session to
+  // "Playback" category, bypassing the hardware silent switch.
+  var _iosAudio = (function(){
+    var el = document.createElement('audio');
+    el.src = 'data:audio/mpeg;base64,/+MYxAAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    el.loop = true;
+    el.volume = 0.001;
+    el.setAttribute('playsinline','');
+    return el;
+  })();
+
   var tMaster, tGlobalLP, tGlobalHP;
   var tPadSynth, tPadFilter, tPadReverb, tPadPanner;
   var tPluck, tPluckDelay, tPluckRev, tPluckPan;
@@ -991,6 +1002,7 @@
   /* ── iOS: resume AudioContext on page visibility restore ── */
   document.addEventListener('visibilitychange',function(){
     if(document.visibilityState==='visible'&&sonoOn){
+      _iosAudio.play().catch(function(){});
       Tone.start().then(function(){ if(sonoReady) Tone.context.resume(); });
     }
   });
@@ -1000,13 +1012,14 @@
     if(!sonoOn){
       var self=this;
       Tone.start().then(function(){
+        _iosAudio.play().catch(function(){}); // bypass iOS silent switch
         sonoInit(); sonoResume(); sonoOn=true;
         self.textContent='on'; self.classList.add('on');
         document.getElementById('sono-panel').classList.remove('sono-off');
         setSonoBtns(true); sonoResizeSVG(); drawAllCables();
       });
     } else {
-      sonoOn=false; sonoSilence();
+      sonoOn=false; sonoSilence(); _iosAudio.pause();
       if(isRecording) stopRec();
       this.textContent='off'; this.classList.remove('on');
       document.getElementById('sono-panel').classList.add('sono-off');
