@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>émergence — ignite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --paper:#f5f3ea; --ink:#1a1410; --accent:#d97647; }
+
+  html,body{ margin:0; height:100%; background:#e8d8c9; }
+  body{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:32px 24px; box-sizing:border-box; position:relative;
+    font-family:"Space Mono", monospace;
+  }
+
+  /* ── JP Pulp background layers ── */
+  .fz-grid{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><path d='M 20 0 L 0 0 0 20' fill='none' stroke='%231a1410' stroke-width='0.5' opacity='0.15'/></svg>"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><path d='M 100 0 L 0 0 0 100' fill='none' stroke='%231a1410' stroke-width='0.9' opacity='0.20'/></svg>");
+  }
+  .fz-patches{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:
+      radial-gradient(ellipse 30% 22% at  6% 88%, #e8d8c9 25%, rgba(232,216,201,0) 100%),
+      radial-gradient(ellipse 24% 18% at 92%  9%, #e8d8c9 20%, rgba(232,216,201,0) 100%),
+      radial-gradient(ellipse 18% 24% at 80% 60%, #e8d8c9 18%, rgba(232,216,201,0) 100%),
+      radial-gradient(ellipse 14% 10% at 42% 24%, #e8d8c9 30%, rgba(232,216,201,0) 100%),
+      radial-gradient(ellipse 16% 12% at 55% 82%, #e8d8c9 22%, rgba(232,216,201,0) 100%),
+      radial-gradient(ellipse 10% 14% at 22% 55%, #e8d8c9 15%, rgba(232,216,201,0) 100%),
+      linear-gradient(to right, rgba(26,20,16,0.08) 0%, rgba(26,20,16,0.02) 6%, rgba(26,20,16,0) 14%),
+      radial-gradient(ellipse 55% 45% at 98% 4%,  rgba(26,20,16,0.07) 0%, rgba(26,20,16,0) 100%),
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(232,216,201,0) 40%, rgba(205,192,180,0.18) 100%);
+  }
+  .fz-speedlines{
+    position:fixed; top:0; right:0; width:220px; height:220px; z-index:2; opacity:.1; pointer-events:none;
+  }
+  .fz-hatch{
+    position:fixed; bottom:0; left:0; width:180px; height:180px; z-index:2; opacity:.07; pointer-events:none;
+  }
+  .fz-border{
+    position:fixed; inset:10px; z-index:8; pointer-events:none; border:2px solid var(--ink);
+  }
+
+  /* ── home logo ── */
+  #home-logo{ position:fixed; top:20px; left:20px; z-index:100; }
+  #home-logo img{ height:36px; width:auto; display:block; opacity:.9; transition:opacity .2s; }
+  #home-logo img:hover{ opacity:1; }
+
+  /* ── unified panel: poster + controls as one card ── */
+  #panel{
+    position:relative; z-index:5;
+    width:min(900px, 92vw);
+    border:2px solid var(--ink);
+    box-shadow:6px 6px 0 var(--ink);
+  }
+
+  #poster{
+    position:relative;
+    width:100%; aspect-ratio:3/2;
+    background:var(--paper);
+    overflow:hidden;
+  }
+
+  canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  #grain{
+    position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply; opacity:.06;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* ── controls bar ── */
+  #controls{
+    width:100%; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center;
+    padding:12px 16px; box-sizing:border-box;
+    background:var(--paper);
+    border-top:2px solid var(--ink);
+    font:700 10px/1.2 "Space Mono", monospace;
+    color:var(--ink);
+    letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+  #controls label{ display:flex; align-items:center; gap:7px; }
+  #controls input[type=range]{ accent-color:var(--accent); width:88px; cursor:pointer; }
+  #controls input[type=number]{
+    width:52px; font:inherit; letter-spacing:0;
+    background:var(--paper); border:2px solid var(--ink);
+    padding:4px 6px; color:var(--ink);
+  }
+  #controls select{
+    font:inherit; background:var(--paper);
+    border:2px solid var(--ink); padding:5px 8px;
+    color:var(--ink); cursor:pointer;
+  }
+  #controls button{
+    font:inherit; color:var(--ink);
+    background:transparent; border:2px solid var(--ink);
+    padding:6px 14px; cursor:pointer;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  #controls button:hover{
+    background:var(--accent); color:var(--paper); border-color:var(--accent);
+  }
+  #controls .sep-line{
+    width:0; height:20px; border-left:1.5px solid rgba(26,20,16,.25);
+  }
+  .val{ min-width:28px; display:inline-block; }
+  .sep{ width:100%; height:0; }
+</style>
+</head>
+<body>
+  <!-- JP Pulp background -->
+  <div class="fz-grid"></div>
+  <div class="fz-patches"></div>
+  <svg class="fz-speedlines" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <line x1="220" y1="0"   x2="0"   y2="220" stroke="#1a1410" stroke-width="1.2"/>
+    <line x1="200" y1="0"   x2="0"   y2="185" stroke="#1a1410" stroke-width=".8"/>
+    <line x1="178" y1="0"   x2="0"   y2="150" stroke="#1a1410" stroke-width="1"/>
+    <line x1="150" y1="0"   x2="0"   y2="110" stroke="#1a1410" stroke-width=".7"/>
+    <line x1="118" y1="0"   x2="0"   y2="74"  stroke="#1a1410" stroke-width="1.1"/>
+    <line x1="220" y1="38"  x2="55"  y2="220" stroke="#1a1410" stroke-width=".9"/>
+    <line x1="220" y1="82"  x2="100" y2="220" stroke="#1a1410" stroke-width=".7"/>
+    <line x1="220" y1="135" x2="150" y2="220" stroke="#1a1410" stroke-width=".9"/>
+  </svg>
+  <svg class="fz-hatch" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <pattern id="fzhatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="9" stroke="#1a1410" stroke-width="1.2"/>
+      </pattern>
+    </defs>
+    <rect width="180" height="180" fill="url(#fzhatch)"/>
+  </svg>
+  <div class="fz-border"></div>
+
+  <a id="home-logo" href="../index.html"><img src="../assets/logo/logo_black.jpeg" alt="émergence — home"></a>
+
+  <div id="panel">
+    <div id="poster">
+      <canvas id="gol"></canvas>
+      <div id="grain"></div>
+    </div>
+
+    <div id="controls">
+      <button id="freeze">pause / capture</button>
+      <button id="restart">restart</button>
+      <div class="sep-line"></div>
+    <label>seed <input id="seed" type="number" min="0" value="1"></label>
+    <button id="rand">random</button>
+    <label>mutation <input id="noise" type="range" min="0" max="30" value="0"><span class="val" id="noiseV">0%</span></label>
+    <div class="sep"></div>
+    <label>rule
+      <select id="rule">
+        <option value="Conway">Conway · B3/S23</option>
+        <option value="HighLife">HighLife · B36/S23</option>
+        <option value="DayNight">Day &amp; Night · B3678/S34678</option>
+        <option value="Maze">Maze · B3/S12345</option>
+        <option value="Seeds">Seeds · B2/S–</option>
+        <option value="Replicator">Replicator · B1357/S1357</option>
+      </select>
+    </label>
+    <label>speed <input id="speed" type="range" min="20" max="400" value="140"><span class="val" id="speedV">140</span></label>
+    <label>structure&nbsp;≥ <input id="thr" type="range" min="2" max="40" value="10"><span class="val" id="thrV">10</span></label>
+    </div>
+  </div>
+
+<script>
+(function(){
+  /* ====== TWEAKABLE DEFAULTS (also exposed as on-screen controls) ====== */
+  var STRUCTURE_THRESHOLD = 10;          // connected cluster of this size (or more) turns accent
+  var ACCENT_COLOR        = '#d97647';
+  var INK                 = '#1c1b17';
+  var RESEED_EVERY        = 500;         // generations between re-forming the word (0 = never)
+  var INTRO_PAUSE         = 2000;        // ms the word holds still at start / restart before evolving
+  var SEED                = 1;           // PRNG seed — same seed + same settings => identical run
+  var NOISE               = 0;           // % of cells randomly flipped on the word (0 = pure, deterministic)
+  var STEP_MS             = 140;         // ms per generation
+  /* ====================================================================== */
+
+  var RULES={
+    Conway:{b:[3],s:[2,3]}, HighLife:{b:[3,6],s:[2,3]},
+    DayNight:{b:[3,6,7,8],s:[3,4,6,7,8]}, Maze:{b:[3],s:[1,2,3,4,5]},
+    Seeds:{b:[2],s:[]}, Replicator:{b:[1,3,5,7],s:[1,3,5,7]}
+  };
+  var bArr=[], sArr=[];
+  function applyRule(name){ var r=RULES[name]; bArr=Array(9).fill(false); sArr=Array(9).fill(false);
+    r.b.forEach(function(k){bArr[k]=true;}); r.s.forEach(function(k){sArr[k]=true;}); }
+  applyRule('Conway');
+
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);
+    t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+  var poster=document.getElementById('poster'), cv=document.getElementById('gol'), ctx=cv.getContext('2d');
+  var cols=100, rows=67, cell, grid, jit, running=true, timer=null, introT=null, gen=0;
+
+  function fit(){
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    var w=poster.clientWidth, h=poster.clientHeight;
+    cv.width=w*dpr; cv.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    cell=w/cols; rows=Math.max(44,Math.round(h/cell));
+  }
+  function blank(){var g=[];for(var y=0;y<rows;y++)g.push(new Array(cols).fill(0));return g;}
+  function set(g,y,x){if(y>=0&&y<rows&&x>=0&&x<cols)g[y][x]=1;}
+
+  function placeWord(g){
+    var off=document.createElement('canvas'); off.width=cols; off.height=rows;
+    var o=off.getContext('2d');
+    o.fillStyle='#fff'; o.fillRect(0,0,cols,rows);
+    o.fillStyle='#000'; o.textAlign='center'; o.textBaseline='middle';
+    var word='emergence', base=20;
+    o.font='900 '+base+'px Arial, sans-serif';
+    var w=o.measureText(word).width;
+    var fs=Math.min(base*(cols*0.9)/w, rows*0.68);
+    o.font='900 '+fs+'px Arial, sans-serif';
+    o.fillText(word, cols/2, rows/2);
+    var d=o.getImageData(0,0,cols,rows).data;
+    for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){ if(d[(y*cols+x)*4]<128) set(g,y,x); }
+    if(NOISE>0){ var rng=mulberry32(SEED|0), p=NOISE/100;
+      for(var y2=0;y2<rows;y2++)for(var x2=0;x2<cols;x2++){ if(rng()<p) g[y2][x2]^=1; } }
+  }
+  function buildJit(){
+    jit=[];for(var y=0;y<rows;y++){jit.push([]);for(var x=0;x<cols;x++)
+      jit[y].push([(Math.random()-0.5)*cell*0.3,(Math.random()-0.5)*cell*0.3,0.33+Math.random()*0.13,0.78+Math.random()*0.22]);}
+  }
+  function seed(){ grid=blank(); placeWord(grid); buildJit(); gen=0; }
+
+  function step(){
+    var n=blank();
+    for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){
+      var c=0;
+      for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
+        if(!dx&&!dy)continue; var ny=y+dy,nx=x+dx;
+        if(ny>=0&&ny<rows&&nx>=0&&nx<cols&&grid[ny][nx])c++;
+      }
+      n[y][x]=(grid[y][x]?(sArr[c]?1:0):(bArr[c]?1:0));
+    }
+    grid=n;
+  }
+  function components(){
+    var size=[],seen=[];
+    for(var y=0;y<rows;y++){size.push(new Array(cols).fill(0));seen.push(new Array(cols).fill(0));}
+    for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){
+      if(grid[y][x] && !seen[y][x]){
+        var stack=[[y,x]], cells=[]; seen[y][x]=1;
+        while(stack.length){
+          var p=stack.pop(); cells.push(p);
+          for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){
+            if(!dx&&!dy)continue; var ny=p[0]+dy,nx=p[1]+dx;
+            if(ny>=0&&ny<rows&&nx>=0&&nx<cols&&grid[ny][nx]&&!seen[ny][nx]){seen[ny][nx]=1;stack.push([ny,nx]);}
+          }
+        }
+        for(var i=0;i<cells.length;i++) size[cells[i][0]][cells[i][1]]=cells.length;
+      }
+    }
+    return size;
+  }
+  function draw(){
+    var size=components();
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(var y=0;y<rows;y++)for(var x=0;x<cols;x++) if(grid[y][x]){
+      var j=jit[y][x];
+      ctx.fillStyle=(size[y][x]>=STRUCTURE_THRESHOLD)?ACCENT_COLOR:INK;
+      ctx.globalAlpha=j[3];
+      ctx.beginPath();
+      ctx.arc(x*cell+cell/2+j[0], y*cell+cell/2+j[1], cell*j[2], 0, 6.2832);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  function loop(){
+    step(); gen++;
+    if(RESEED_EVERY>0 && gen%RESEED_EVERY===0){ grid=blank(); placeWord(grid); }
+    draw();
+  }
+  function clearTimers(){ if(timer)clearInterval(timer); if(introT)clearTimeout(introT); timer=null; introT=null; }
+  function beginRun(){ clearTimers(); if(!running)return; introT=setTimeout(function(){ introT=null; timer=setInterval(loop,STEP_MS); }, INTRO_PAUSE); }
+  function restart(){ seed(); draw(); beginRun(); }
+  function start(){ fit(); seed(); draw(); beginRun(); }
+
+  /* ---- controls ---- */
+  var btn=document.getElementById('freeze');
+  btn.addEventListener('click',function(){
+    running=!running;
+    if(running){ clearTimers(); timer=setInterval(loop,STEP_MS); btn.textContent='pause / capture'; }
+    else { clearTimers(); btn.textContent='resume'; }
+  });
+  document.getElementById('restart').addEventListener('click',restart);
+
+  var seedIn=document.getElementById('seed');
+  seedIn.addEventListener('change',function(){ SEED=parseInt(this.value)||0; restart(); });
+  document.getElementById('rand').addEventListener('click',function(){
+    SEED=Math.floor(Math.random()*1e6); seedIn.value=SEED;
+    if(NOISE===0){ NOISE=8; document.getElementById('noise').value=8; document.getElementById('noiseV').textContent='8%'; }
+    restart();
+  });
+  document.getElementById('noise').addEventListener('input',function(){
+    NOISE=parseInt(this.value); document.getElementById('noiseV').textContent=NOISE+'%'; restart();
+  });
+  document.getElementById('rule').addEventListener('change',function(){ applyRule(this.value); });
+  document.getElementById('speed').addEventListener('input',function(){
+    STEP_MS=parseInt(this.value); document.getElementById('speedV').textContent=STEP_MS;
+    if(running&&timer){ clearInterval(timer); timer=setInterval(loop,STEP_MS); }
+  });
+  document.getElementById('thr').addEventListener('input',function(){
+    STRUCTURE_THRESHOLD=parseInt(this.value); document.getElementById('thrV').textContent=STRUCTURE_THRESHOLD;
+    if(!running) draw();
+  });
+
+  window.addEventListener('resize',function(){clearTimeout(window.__r);window.__r=setTimeout(start,200);});
+  start();
+})();
+</script>
+</body>
+</html>

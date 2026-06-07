@@ -134,7 +134,7 @@ body {
 /* floating object positions */
 .fz-obj { position: fixed; z-index: 3; pointer-events: none; }
 .fz-obj.ctrl { top: 5%;   left: 2%;   animation: drA 22s ease-in-out infinite; }
-.fz-obj.disk { bottom: 8%; right: 20%; animation: drB 26s ease-in-out infinite; }
+.fz-obj.disk { bottom: 8%; right: 20%; animation: drB 26s ease-in-out infinite; pointer-events: auto; cursor: pointer; }
 .fz-obj.can  { top: 47%;  left: 0%;   animation: drC 17s ease-in-out infinite; }
 .fz-obj.ash  { top: 13%;  right: 10%; animation: drD 23s ease-in-out infinite; }
 
@@ -458,7 +458,7 @@ const THEMES = {
       </svg>
 
       <div class="fz-obj ctrl"><img src="assets/retro_japanese_pulp/controller.svg" width="130" height="96"  alt="" draggable="false"></div>
-      <div class="fz-obj disk"><img src="assets/retro_japanese_pulp/disk.svg"       width="78"  height="80"  alt="" draggable="false"></div>
+      <div class="fz-obj disk"><a href="pages/0_ignite.html"><img src="assets/retro_japanese_pulp/disk.svg" width="78" height="80" alt="Ignite" draggable="false"></a></div>
       <div class="fz-obj can" ><img src="assets/retro_japanese_pulp/can.svg"        width="90"  height="162" alt="" draggable="false"></div>
       <div class="fz-obj ash" ><img src="assets/retro_japanese_pulp/ashtray.svg"    width="118" height="90"  alt="" draggable="false"></div>`,
 
